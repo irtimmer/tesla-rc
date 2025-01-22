@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <title>Tesla RC</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="index.js"></script>
+        <style>
+            dl {
+                display: grid;
+            }
+            dt {
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container py-4">
+            <header class="pb-3 mb-4 border-bottom">
+                <span class="fs-4">Tesla RC</span>
+            </header>
+            <div class="row">
+                <div class="col h-100 p-3 bg-body-tertiary border rounded-3 m-3">
+                    <dl>
+                        <dt>Blinker state</dt>
+                        <dd id="blinker_state"></dd>
+                        <dt>Heading</dt>
+                        <dd id="heading"></dd>
+                        <dt>Latitude</dt>
+                        <dd id="latitude"></dd>
+                        <dt>Longitude</dt>
+                        <dd id="longitude"></dd>
+                        <dt>Shift State</dt>
+                        <dd id="shift_state"></dd>
+                        <dt>Speed</dt>
+                        <dd id="speed"></dd>
+                    </dl>
+                </div>
+                <div class="col h-100 p-3 bg-body-tertiary border rounded-3 m-3">
+                    <dl>
+                        <dt>Autopark State</dt>
+                        <dd id="autopark_state"></dd>
+                        <dt>Autopark State Reason</dt>
+                        <dd id="autopark_state_reason"></dd>
+                        <dt>Smart Summon Last Abort Reason</dt>
+                        <dd id="smart_summon_last_abort_reason"></dd>
+                        <dt>Smart Summon Last Safety Monitor Abort Reason</dt>
+                        <dd id="smart_summon_last_safety_monitor_abort_reason"></dd>
+                        <dt>Smart Summon Unavailable Reason</dt>
+                        <dd id="smart_summon_last_unavailable_reason"></dd>
+                        <dt>Smart Summon Last Wait Reason</dt>
+                        <dd id="smart_summon_last_wait_reason"></dd>
+                        <dt>Smart Summon Leash Proximity Meters</dt>
+                        <dd id="smart_summon_leash_proximity_meters"></dd>
+                        <dt>Smart Summon Leash Travel Meters</dt>
+                        <dd id="smart_summon_leash_travel_meters"></dd>
+                        <dt>Smart Summon State</dt>
+                        <dd id="smart_summon_state"></dd>
+                        <dt>Smart Summon Time Until Ready</dt>
+                        <dd id="smart_summon_time_until_ready"></dd>
+                    </dl>
+                </div>
+            </div>
+            <footer class="pt-3 mt-4 text-body-secondary border-top">
+                Iwan Timmer &copy; 2025
+            </footer>
+        </div>
+    </body>
+</html>
