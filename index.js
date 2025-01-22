@@ -1,5 +1,7 @@
 let socket = null
 let pc = null
+
+let currentCamera = 'grid'
 let map = null
 let carMarker = null
 
@@ -67,6 +69,15 @@ const connect = (async () => {
     socket.send(JSON.stringify(msg))
 
 })
+
+const switchCamera = (camera) => {
+    socket.send(JSON.stringify({
+        msg_type: 'webcam:switch',
+        camera: camera,
+        prevCamera: currentCamera
+    }))
+    currentCamera = camera
+}
 function initWebRTC(iceServers) {
     pc = new RTCPeerConnection({
         iceServers: iceServers
@@ -98,6 +109,10 @@ function initWebRTC(iceServers) {
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('connectButton').addEventListener('click', connect)
     document.getElementById('disconnectButton').addEventListener('click', () => pc.close())
+    document.getElementById('switchGrid').addEventListener('click', () => switchCamera('grid'))
+    document.getElementById('switchMain').addEventListener('click', () => switchCamera('main'))
+    document.getElementById('switchFront').addEventListener('click', () => switchCamera('front'))
+    document.getElementById('switchBack').addEventListener('click', () => switchCamera('back'))
 
     // Initialize the map
     const map = L.map('map').setView([0, 0], 18); // Default location: London
