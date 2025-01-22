@@ -11,6 +11,7 @@ let carState = {
 let map = null
 let targetMarker = null
 let carMarker = null
+let pathLine = null
 
 // HACK: SDP modification to inject VP8/100, required to get video stream from the car
 const sdpInjectVP8100 = (input) => {
@@ -117,6 +118,14 @@ const cmdDrive = (action) => {
     }
 }
 
+function convertToLatLngPairs(flatList) {
+    const latLngPairs = [];
+    for (let i = 0; i < flatList.length; i += 2) {
+      latLngPairs.push([flatList[i], flatList[i + 1]]);
+    }
+    return latLngPairs;
+}
+
 function initWebRTC(iceServers) {
     pc = new RTCPeerConnection({
         iceServers: iceServers
@@ -168,6 +177,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     targetMarker = L.marker([0, 0]).addTo(map);
     carMarker = L.marker([0, 0]).addTo(map);
+
+    pathLine = L.polyline([], {
+        color: 'blue', // Line color
+        weight: 4, // Line thickness
+        opacity: 0.7 // Line opacity
+    }).addTo(map);
+
     map.on('click', function (e) {
         const { lat, lng } = e.latlng;
     
@@ -212,6 +228,8 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('connectButton').removeAttribute('disabled')
         } else if (msg.msg_type == "webcam:unavailable") {
             document.getElementById('connectButton').setAttribute('disabled', 'disabled')
+        } else if (msg.msg_type == "autopark:smart_summon_viz") {
+            pathLine.setLatLngs(convertToLatLngPairs(msg.path))
         } else if (msg.msg_type == "autopark:cmd_result") {
             if (msg.cmd_type.startsWith("autopark:cmd")) {
                 if (!msg.result && heartbeat) {
