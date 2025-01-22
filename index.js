@@ -1,8 +1,15 @@
 let socket = null
 let pc = null
+let heartbeat = null
 
 let currentCamera = 'grid'
+let carState = {
+    latitude: null,
+    longitude: null,
+}
+
 let map = null
+let targetMarker = null
 let carMarker = null
 
 // HACK: SDP modification to inject VP8/100, required to get video stream from the car
@@ -78,6 +85,38 @@ const switchCamera = (camera) => {
     }))
     currentCamera = camera
 }
+
+const cmdAbort = () => {
+    socket.send(JSON.stringify({
+        msg_type: 'autopark:cmd_abort'
+    }))
+    if (heartbeat) {
+        clearInterval(heartbeat)
+        heartbeat = null
+    }
+}
+
+const cmdDrive = (action) => {
+    socket.send(JSON.stringify({
+        msg_type: 'autopark:cmd_' + action,
+        latitude: carState.latitude,
+        longitude: carState.longitude
+    }))
+    if (!heartbeat) {
+        heartbeat = setInterval(() => {
+            socket.send(JSON.stringify({
+                msg_type: 'autopark:heartbeat_app',
+                timestamp: Date.now()
+            }))
+            socket.send(JSON.stringify({
+                msg_type: 'autopark:device_location',
+                latitude: carState.latitude,
+                longitude: carState.longitude
+            }))
+        }, 1000)
+    }
+}
+
 function initWebRTC(iceServers) {
     pc = new RTCPeerConnection({
         iceServers: iceServers
@@ -114,6 +153,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('switchFront').addEventListener('click', () => switchCamera('front'))
     document.getElementById('switchBack').addEventListener('click', () => switchCamera('back'))
 
+    document.getElementById('cmdAbort').addEventListener('click', cmdAbort)
+    document.getElementById('cmdForward').addEventListener('click', () => cmdDrive('forward'))
+    document.getElementById('cmdReverse').addEventListener('click', () => cmdDrive('reverse'))
+    document.getElementById('cmdFindMe').addEventListener('click', () => cmdDrive('find_me'))
+
     // Initialize the map
     const map = L.map('map').setView([0, 0], 18); // Default location: London
 
@@ -122,7 +166,14 @@ document.addEventListener("DOMContentLoaded", () => {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
+    targetMarker = L.marker([0, 0]).addTo(map);
     carMarker = L.marker([0, 0]).addTo(map);
+    map.on('click', function (e) {
+        const { lat, lng } = e.latlng;
+    
+        // Update the car position
+        targetMarker.setLatLng([lat, lng]);
+    })
 
     // Get VIN from get parameter
     const urlParams = new URLSearchParams(window.location.search);
@@ -161,6 +212,13 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('connectButton').removeAttribute('disabled')
         } else if (msg.msg_type == "webcam:unavailable") {
             document.getElementById('connectButton').setAttribute('disabled', 'disabled')
+        } else if (msg.msg_type == "autopark:cmd_result") {
+            if (msg.cmd_type.startsWith("autopark:cmd")) {
+                if (!msg.result && heartbeat) {
+                    clearInterval(heartbeat)
+                    heartbeat = null
+                }
+            }
         } else if (msg.msg_type == "autopark:status") {
             // Loop over all key and values in the message
             for (const [key, value] of Object.entries(msg)) {
@@ -169,6 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     elem.textContent = value
             }
         } else if (msg.msg_type == "vehicle_data:location") {
+            carState = msg
             carMarker.setLatLng([msg.latitude, msg.longitude])
             map.panTo([msg.latitude, msg.longitude])
     
