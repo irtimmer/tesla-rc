@@ -59,10 +59,10 @@ openssl req -x509 -nodes -newkey ec \
 8. Run the tesla-auth command to get a JWT token for the Owner API `./target/debug/tesla-auth`
 9. Run the tesla-http-proxy command with the required parameters and set the JWT token as an environment variable
 ```bash
-EXPORT TESLA_HTTP_JWT_KEY=ey...
+EXPORT TESLA_HTTP_PROXY_JWT=ey...
 TESLA_KEY_FILE=./private.key cmd/tesla-http-proxy/tesla-http-proxy -cert config/tls-cert.pem -tls-key config/tls-key.pem -mode owner -verbose -port 8443
 ```
 10. Open the https://localhost:8443/ URL in a Chromium browser and accept the self-signed certificate
 11. Start a webserver to serve the files in the `public` directory
 12. Ensure the car is awake and Sentry mode is enabled to receive the live feed
-12. Open the web interface in the browser with as get parameter `?vin=your_vin`
+13. Open the web interface in the browser with as get parameter `?vin=your_vin`
