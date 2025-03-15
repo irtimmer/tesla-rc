@@ -106,7 +106,7 @@ const cmdDrive = (action) => {
     if (!heartbeat) {
         heartbeat = setInterval(() => {
             socket.send(JSON.stringify({
-                msg_type: 'autopark:heartbeat_app',
+                msg_type: 'autopark:heartbeat_app_webrtc',
                 timestamp: Date.now()
             }))
             socket.send(JSON.stringify({
@@ -230,6 +230,8 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('connectButton').setAttribute('disabled', 'disabled')
         } else if (msg.msg_type == "autopark:smart_summon_viz") {
             pathLine.setLatLngs(convertToLatLngPairs(msg.path))
+        } else if (msg.msg_type == "autopark:heartbeat_car_webrtc") {
+            document.getElementById("car_timestamp").textContent = msg.car_timestamp
         } else if (msg.msg_type == "autopark:cmd_result") {
             if (msg.cmd_type.startsWith("autopark:cmd")) {
                 if (!msg.result && heartbeat) {
